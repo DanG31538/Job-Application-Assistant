@@ -1,0 +1,6 @@
+requests==2.26.0  # for sending HTTP requests
+selenium==3.141.0
+PyPDF2==1.26.0
+python-docx==0.8.11
+2captcha-python==1.1.0  # for potential captcha handling
+beautifulsoup4==4.9.3  # for web scraping if needed
