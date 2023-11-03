@@ -1,0 +1,51 @@
+{
+    "Login": {
+      "URL": "",
+      "Email/Username Input": {
+        "Identifier": ""
+      },
+      "Password Input": {
+        "Identifier": ""
+      },
+      "Sign in Button": {
+        "Identifier": ""
+      }
+    },
+    "Job Search": {
+      "URL": "",
+      "Job Title Input": {
+        "Identifier": ""
+      },
+      "Magnifying Glass (Initialize Search Fields) Icon": {
+        "Identifier": ""
+      },
+      "Location Input": {
+        "Identifier": ""
+      },
+      "Initiate Search": {
+        "Method": ""
+      }
+    },
+    "Iterate Through Job Listings": {
+      "Job Link": {
+        "Identifier": ""
+      }
+    },
+    "Apply for Job": {
+      "Easy Apply Button": {
+        "Identifier": ""
+      },
+      "Form Fields": {
+        "Field Name (e.g., First Name Input)": {
+          "Email Address": "",
+          "Phone Country Code": "",
+          "Mobile Phone Number": ""
+        },
+        "Next Button": "Next",
+        "Resume": {
+          "Upload": ""
+        }
+      }
+    }
+  }
+  
