@@ -1,51 +1,92 @@
-{
-    "Login": {
-      "URL": "",
-      "Email/Username Input": {
-        "Identifier": ""
-      },
-      "Password Input": {
-        "Identifier": ""
-      },
-      "Sign in Button": {
-        "Identifier": ""
-      }
+"Login": {
+    "URL": "https://www.linkedin.com/login",
+    "Email/Username Input": {
+      "Identifier": "<input id=\"username\" name=\"session_key\" type=\"text\" aria-describedby=\"error-for-username\" required=\"\" validation=\"email|tel\" class=\"\" autofocus=\"\" aria-label=\"Email or Phone\">"
     },
-    "Job Search": {
-      "URL": "",
-      "Job Title Input": {
-        "Identifier": ""
-      },
-      "Magnifying Glass (Initialize Search Fields) Icon": {
-        "Identifier": ""
-      },
-      "Location Input": {
-        "Identifier": ""
-      },
-      "Initiate Search": {
-        "Method": ""
-      }
+    "Password Input": {
+      "Identifier": "<input id=\"password\" type=\"password\" aria-describedby=\"error-for-password\" name=\"session_password\" required=\"\" validation=\"password\" autocomplete=\"current-password\" class=\"\" aria-label=\"Password\">"
     },
-    "Iterate Through Job Listings": {
-      "Job Link": {
-        "Identifier": ""
-      }
+    "Sign in Button": {
+      "Identifier": "<button class=\"btn__primary--large from__button--floating\" data-litms-control-urn=\"login-submit\" type=\"submit\" aria-label=\"Sign in\">Sign in</button>"
+    }
+  },
+  "Job Search": {
+    "URL": "https://www.linkedin.com/jobs/",
+    "All Filters Button": {
+        "Identifier": "<button class=\\\"artdeco-pill artdeco-pill--slate artdeco-pill--choice artdeco-pill--2 search-reusables__filter-pill-button\\n     search-reusables__filter-pill-button search-reusables__all-filters-pill-button\\\" aria-expanded=\\\"false\\\" aria-label=\\\"Show all filters. Clicking this button displays all available filter options.\\\" id=\\\"ember1985\\\" type=\\\"button\\\">\\n  \\n    All filters\\n  \\n</button>"
+      },
+      "Easy Apply Toggle": {
+        "Identifier": "<input role=\\\"switch\\\" aria-checked=\\\"false\\\" class=\\\"input artdeco-toggle__button \\\" data-artdeco-toggle-button=\\\"true\\\" id=\\\"adToggle_ember2355\\\" type=\\\"checkbox\\\">"
+      },
+      "Show Results Button": {
+        "Identifier": "<button data-test-reusables-filters-modal-show-results-button=\\\"true\\\" aria-label=\\\"Apply current filters to show results\\\" id=\\\"ember2386\\\" class=\\\"reusable-search-filters-buttons search-reusables__secondary-filters-show-results-button artdeco-button artdeco-button--2 artdeco-button--primary ember-view\\\" type=\\\"button\\\"><!---->\\n<span class=\\\"artdeco-button__text\\\">\\n    Show results\\n</span></button>"
+      }, 
+    "Job Title Input": {
+      "Identifier": "<input id=\"jobs-search-box-keyword-id-ember214\" class=\"jobs-search-box__text-input jobs-search-box__keyboard-text-input\" autocomplete=\"organization-title\" spellcheck=\"false\" role=\"combobox\" aria-autocomplete=\"list\" aria-label=\"Search by title, skill, or company\" aria-activedescendant=\"\" aria-expanded=\"false\" type=\"text\">"
     },
+    "Magnifying Glass (Initialize Search Fields) Icon": {
+      "Identifier": "<label for=\"jobs-search-box-keyword-id-ember214\" class=\"jobs-search-box__input-icon jobs-search-box__keywords-label\">\\n        <span class=\"visually-hidden\">\\n          Search by title, skill, or company\\n        </span>\\n        <svg role=\"none\" aria-hidden=\"true\" class=\"jobs-search-box__search-icon--custom\" xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" data-supported-dps=\"16x16\" data-test-icon=\"search-small\">\\n<!---->"
+    },
+    "Location Input": {
+      "Identifier": "<input id=\"jobs-search-box-location-id-ember214\" class=\"jobs-search-box__text-input\" autocomplete=\"address-level2\" spellcheck=\"false\" role=\"combobox\" aria-autocomplete=\"list\" aria-label=\"City, state, or zip code\" aria-activedescendant=\"\" aria-expanded=\"false\" type=\"text\">"
+    },
+    "Initiate Search": {
+      "Method": "Press \"Enter\""
+    }
+  },
+  "Iterate Through Job Listings": {
+    "Job Link": {
+      "Identifier": ""
+    }
+  },
+  "Apply for Job": {
+    "Easy Apply Button": {
+      "Identifier": "<button aria-label=\"Easy Apply to MLOps Engineer - Machine Learning Infrastructure at Harrison Clarke\" id=\"ember1209\" class=\"jobs-apply-button artdeco-button artdeco-button--3 artdeco-button--primary ember-view\" data-job-id=\"3658292004\">    <li-icon aria-hidden=\"true\" type=\"linkedin-bug\" class=\"artdeco-button__icon artdeco-button__icon--in-bug\" size=\"14dp\" color=\"inverse\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 14 14\" data-supported-dps=\"14x14\" fill=\"currentColor\" class=\"mercado-match\" width=\"14\" height=\"14\" focusable=\"false\">\\n        <g>\\n          <path class=\"background-mercado\" d=\"M14 1v12a1 1 0 01-1 1H1a1 1 0 01-1-1V1a1 1 0 011-1h12a1 1 0 011 1zM4 5H2v7h2zm.25-2A1.27 1.27 0 003 1.8 1.27 1.27 0 001.75 3 1.27 1.27 0 003 4.2 1.27 1.27 0 004.25 3zM12 8.29c0-2.2-.73-3.49-2.86-3.49A2.71 2.71 0 006.89 6V5H5v7h2V8.73A1.74 1.74 0 018.66 6.8C9.82 6.8 10 7.94 10 8.73V12h2z\"></path>\\n        </g>\\n      </svg></li-icon>\\n  \\n  <span class=\"artdeco-button__text\">\\n      Easy Apply\\n  </span></button>"
+    },
+    "Form Fields": {
+      "Field Name (e.g., First Name Input)": {
+        "Email Address": "<select id=\"text-entity-list-form-component-formElement-urn-li-jobs-applyformcommon-easyApplyFormElement-3727217571-99714989-multipleChoice\" aria-describedby=\"text-entity-list-form-component-formElement-urn-li-jobs-applyformcommon-easyApplyFormElement-3727217571-99714989-multipleChoice-error\" aria-required=\"true\" required=\"\" data-test-text-entity-list-form-select=\"\">\\n          <option value=\"Select an option\">\\n            Select an option\\n          </option>\\n          <option value=\"dangarcia31538@gmail.com\">\\n            dangarcia31538@gmail.com\\n          </option>\\n      </select>",
+        "Phone Country Code": "<select id=\"text-entity-list-form-component-formElement-urn-li-jobs-applyformcommon-easyApplyFormElement-3727217571-99714981-phoneNumber-country\" aria-describedby=\"text-entity-list-form-component-formElement-urn-li-jobs-applyformcommon-easyApplyFormElement-3727217571-99714981-phoneNumber-country-error\" aria-required=\"true\" required=\"\" data-test-text-entity-list-form-select=\"\">\\n          <option value=\"Select an option\">\\n            Select an option\\n          </option>\\n          <option value=\"United States (+1)\">\\n            United States (+1)\\n          </option>",
+        "Mobile Phone Number": "<input class=\" artdeco-text-input--input\" id=\"single-line-text-form-component-formElement-urn-li-jobs-applyformcommon-easyApplyFormElement-3727217571-99714981-phoneNumber-nationalNumber\" required=\"\" aria-describedby=\"single-line-text-form-component-formElement-urn-li-jobs-applyformcommon-easyApplyFormElement-3727217571-99714981-phoneNumber-nationalNumber-error\" type=\"text\">"
+      },
+      "Next Button": "Next",
+      "Resume": {
+        "Upload": ""
+      }
+    }
+  }
+  {
     "Apply for Job": {
       "Easy Apply Button": {
-        "Identifier": ""
+        "Identifier": "<button aria-label=\"Easy Apply to MLOps Engineer - Machine Learning Infrastructure at Harrison Clarke\" id=\"ember1209\" class=\"jobs-apply-button artdeco-button artdeco-button--3 artdeco-button--primary ember-view\" data-job-id=\"3658292004\"> ... </button>"
       },
       "Form Fields": {
-        "Field Name (e.g., First Name Input)": {
-          "Email Address": "",
-          "Phone Country Code": "",
-          "Mobile Phone Number": ""
+        "Email Address": {
+          "Identifier": "<select id=\"text-entity-list-form-component-formElement-...\" aria-describedby=\"...\" aria-required=\"true\" required=\"\" data-test-text-entity-list-form-select=\"\"> ... </select>"
         },
-        "Next Button": "Next",
-        "Resume": {
-          "Upload": ""
+        "Phone Country Code": {
+          "Identifier": "<select id=\"text-entity-list-form-component-formElement-...\" aria-describedby=\"...\" aria-required=\"true\" required=\"\" data-test-text-entity-list-form-select=\"\"> ... </select>"
+        },
+        "Mobile Phone Number": {
+          "Identifier": "<input class=\"artdeco-text-input--input\" id=\"single-line-text-form-component-formElement-...\" required=\"\" aria-describedby=\"...\" type=\"text\">"
         }
+      },
+      "Next Button": {
+        "Identifier": "<button aria-label=\"Continue to next step\" id=\"ember919\" class=\"artdeco-button artdeco-button--2 artdeco-button--primary ember-view\" data-easy-apply-next-button=\"\" type=\"button\"> ... </button>"
+      },
+      "Resume Upload": {
+        "Identifier": "<input type='file' id='resume-upload' ... >"
+      },
+      "Review Button": {
+        "Identifier": "<button aria-label=\"Review your application\" id=\"ember954\" class=\"artdeco-button artdeco-button--2 artdeco-button--primary ember-view\" type=\"button\"> ... </button>"
+      },
+      "Follow Company Toggle": {
+        "Identifier": "<input id=\"follow-company-checkbox\" class=\"ember-checkbox ember-view visually-hidden\" type=\"checkbox\">"
+      },
+      "Submit Application Button": {
+        "Identifier": "<button aria-label=\"Submit application\" id=\"ember964\" class=\"artdeco-button artdeco-button--2 artdeco-button--primary ember-view\" type=\"button\"> ... </button>"
       }
     }
   }
   
+   

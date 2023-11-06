@@ -1,6 +1,7 @@
 requests==2.26.0  # for sending HTTP requests
-selenium==3.141.0
-PyPDF2==1.26.0
+selenium==4.1.0  # Update to the latest Selenium version 4
+PyMuPDF==1.18.14  # Update for PDF handling, if needed
 python-docx==0.8.11
 2captcha-python==1.1.0  # for potential captcha handling
 beautifulsoup4==4.9.3  # for web scraping if needed
+webdriver-manager==3.5.2  # for managing browser drivers
