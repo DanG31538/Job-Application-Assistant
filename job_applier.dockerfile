@@ -40,5 +40,6 @@ COPY main.py /app/
 COPY applier.py /app/
 COPY identifiers.json /app/
 
-# Set the command to run your main.py when the container starts
+# Set the command to run your main.py when the container starts. Last command keeps container running.
 CMD ["python", "main.py"]
+CMD ["tail", "-f", "/dev/null"] 
