@@ -1,0 +1,6 @@
+google-chrome-stable:
+  Installed: (none)
+  Candidate: 119.0.6045.123-1
+  Version table:
+     119.0.6045.123-1 500
+        500 http://dl.google.com/linux/chrome/deb stable/main amd64 Packages
