@@ -6,12 +6,9 @@ RUN apt-get update && apt-get install -y \
     wget \
  && rm -rf /var/lib/apt/lists/*
 
-# Add Google Chrome repository
-RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - \
- && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list
-
-# Install Google Chrome
-RUN apt-get update && apt-get install -y google-chrome-stable
+# Download and install a specific version of Chromium
+RUN wget [URL_OF_SPECIFIC_CHROMIUM_BUILD] -O chromium.deb
+RUN dpkg -i chromium.deb || apt-get install -fy
 
 # Set the working directory
 WORKDIR /app
@@ -26,5 +23,6 @@ COPY webdriver_test_script.py /app/
 # Run the webdriver test script when the container starts and redirect output to a file
 CMD python webdriver_test_script.py > /app/script_output.txt
 
-RUN google-chrome --version > /chrome_version.txt
-
+# Optionally, you can still keep the command to output the installed Chromium version
+RUN which chromium-browser
+RUN chromium-browser --version > /chrome_version.txt

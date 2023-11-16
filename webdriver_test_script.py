@@ -4,6 +4,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 def test_chrome():
     options = webdriver.ChromeOptions()
+    # Specify the path to the Chromium binary
+    options.binary_location = "/path/to/chromium"  # Replace with the actual path
     options.add_argument('--headless')
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
