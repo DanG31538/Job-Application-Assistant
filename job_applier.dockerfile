@@ -1,54 +1,36 @@
-# Use the official Python base image
-FROM python:3.9
+# Start from the official Selenium Chrome standalone image
+FROM selenium/standalone-chrome
 
-# Setting up system packages and dependencies for Chrome
+# Switch to root to install Python
+USER root
+
+# Install Python and pip
 RUN apt-get update && apt-get install -y \
-    wget \
-    unzip \
-    libglib2.0-0 \
-    libnss3 \
-    libx11-6 \
+    python3 \
+    python3-pip \
  && rm -rf /var/lib/apt/lists/*
 
-# Add Google Chrome repository
-RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - \
- && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list
-
-# Debugging: Check the content of the Google Chrome list
-RUN cat /etc/apt/sources.list.d/google-chrome.list
-
-# Update package list
-RUN apt-get update
-
-# Debugging: Check available versions of Google Chrome
-RUN apt-cache policy google-chrome-stable
-
-# Install a specific version of Google Chrome
-#RUN apt-get install -y google-chrome-stable=114.0.5735.90-1
-
-# Debug: Print installed Chrome version
-#RUN echo "Installed Chrome version:" && google-chrome --version
-
-# Install a specific version of ChromeDriver
-RUN CHROMEDRIVER_VERSION=114.0.5735.90 \
- && wget -N http://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip -P ~/ \
- && unzip ~/chromedriver_linux64.zip -d ~/ \
- && mv -f ~/chromedriver /usr/local/bin/chromedriver \
- && chmod +x /usr/local/bin/chromedriver \
- && rm ~/chromedriver_linux64.zip
-
-
-# Set the working directory
+# Set the working directory in the container
 WORKDIR /app
 
-# Copy requirements.txt into the image
-#COPY requirements.txt /app/requirements.txt
+# Copy all the required files into the container
+COPY applier.py /app/
+COPY entrypoint.sh /app/
+COPY identifiers.json /app/
+COPY main.py /app/
+COPY openai_query.py /app/
+COPY requirements.txt /app/
+COPY resume_parser.py /app/
+
+# Make the entrypoint script executable
+RUN chmod +x /app/entrypoint.sh
 
 
-# Install Python dependencies from requirements file
-#RUN pip install --upgrade pip
-#RUN pip install requests
-#RUN pip install --no-cache-dir -r requirements.txt
+# Install Python dependencies
+RUN pip3 install --no-cache-dir -r /app/requirements.txt
 
-# Use the entrypoint script to initialize the container
-#ENTRYPOINT ["/app/entrypoint.sh"]
+# Try installing 2captcha-python separately
+RUN pip3 install 2captcha-python==1.1.0
+
+# Use your entrypoint script to initialize the container
+ENTRYPOINT ["/app/entrypoint.sh"]

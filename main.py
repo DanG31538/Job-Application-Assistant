@@ -1,58 +1,62 @@
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.options import Options
 import json
+import os
 import applier  # assuming applier.py contains the necessary functions
+import logging
+import traceback
 
-# Load the JSON data from the identifiers file
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 def load_identifiers(json_path):
     with open(json_path, 'r') as file:
         data = json.load(file)
     return data
 
 identifiers = load_identifiers('identifiers.json')
-# Initialize the Chrome WebDriver
+
+EMAIL = os.getenv('LINKEDIN_EMAIL')
+PASSWORD = os.getenv('LINKEDIN_PASSWORD')
+
 def initialize_driver():
-    service = Service(ChromeDriverManager().install())
-    options = webdriver.ChromeOptions()
-    # Add any Chrome options you require
-    driver = webdriver.Chrome(service=service, options=options)
+    options = Options()
+    options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    driver = webdriver.Chrome(options=options)
     return driver
 
 driver = initialize_driver()
-def orchestrate(driver, identifiers):
-    # Example resume data structure
-    resume_data = {
-        'email': 'example@email.com',
-        # 'password': 'your_password_here',  # Use environment variables for sensitive data
-    }
-    
-    # Log into LinkedIn
-    applier.login_to_linkedin(driver, resume_data['email'], identifiers)
 
-    # Define job search criteria
-    job_titles = ["Data Scientist", "Machine Learning Engineer"]  # Example job titles
-    location = "San Francisco Bay Area"  # Example location
-    
-    # Search for jobs and apply
-    for job_title in job_titles:
-        applier.search_jobs(driver, job_title, location, identifiers)
+def orchestrate(driver, identifiers):
+    try:
+        applier.login_to_linkedin(driver, EMAIL, PASSWORD, identifiers)
+        job_titles = ["Data Scientist", "Machine Learning Engineer"]
+        location = "New York City"
         
-        # Get job links for the current search results
-        job_links = applier.get_job_links(driver, identifiers)
-        
-        for job_link in job_links:
-            # Navigate to the job's page
-            driver.get(job_link)
-            
-            # Apply for the job
-            applier.apply_for_job(driver, identifiers)
+        for job_title in job_titles:
+            try:
+                applier.search_jobs(driver, job_title, location, identifiers)
+                job_links = applier.get_job_links(driver, identifiers)
+                
+                for job_link in job_links:
+                    try:
+                        driver.get(job_link)
+                        applier.apply_for_job(driver, identifiers)
+                    except Exception as e:
+                        logging.error(f"Error during applying for job at {job_link}: {e}")
+                        traceback.print_exc()
+            except Exception as e:
+                logging.error(f"Error during job search for title '{job_title}': {e}")
+                traceback.print_exc()
+    except Exception as e:
+        logging.error(f"An error occurred in orchestrate function: {e}")
+        traceback.print_exc()
+
 if __name__ == '__main__':
     try:
-        # Execute the orchestration function
         orchestrate(driver, identifiers)
     except Exception as e:
-        print(f"An error occurred during execution: {e}")
+        logging.error("Failed to run orchestrate function")
+        traceback.print_exc()
     finally:
-        # Close the browser once done
         driver.quit()

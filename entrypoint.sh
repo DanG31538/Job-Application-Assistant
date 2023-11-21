@@ -1,3 +1,3 @@
 #!/bin/bash
-python /app/main.py
-tail -f /dev/null
+# Keep the container running and provide a shell prompt
+bash
