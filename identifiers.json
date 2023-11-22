@@ -56,11 +56,11 @@
           "Identifier": "input#single-line-text-form-component-formElement-phoneNumber-nationalNumber"
         }
       },
-      "Next Button": {
-        "Identifier": "button[type='submit'][aria-label='Next']"  // Example, adjust as per actual LinkedIn markup
+      "Next Button on Easy Apply Form": {
+        "Identifier": "aria-label: button[aria-label='Continue to next step']"  
       },
       "Submit Application": {
-        "Identifier": "input[type='file']"  // Example, adjust as per actual LinkedIn markup
+        "Identifier": "aria-label: button[aria-label='Submit application']"  
       }
     }
   }
