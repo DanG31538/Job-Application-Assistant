@@ -23,7 +23,7 @@
       "Identifier": "button[data-test-reusables-filters-modal-show-results-button='true']"
     },
     "Job Title Input": {
-      "Identifier": "#jobs-search-box-keyword-id-ember214"
+      "Identifier": ".search-global-typeahead__input"
     },
     "Magnifying Glass (Initialize Search Fields) Icon": {
       "Identifier": "label[for='jobs-search-box-keyword-id-ember214']"
@@ -37,7 +37,7 @@
   },
   "Iterate Through Job Listings": {
     "Job Link": {
-      "Identifier": "a[data-control-name='job_card']"  // Example, adjust as per actual LinkedIn markup
+      "Identifier": "a.job-card-container__link.job-card-list__title"
     }
   },
   "Apply for Job": {
@@ -45,22 +45,20 @@
       "Identifier": "button[data-job-id]"
     },
     "Form Fields": {
-      "Field Name (e.g., First Name Input)": {
-        "Email Address": {
-          "Identifier": "select#text-entity-list-form-component-formElement"
-        },
-        "Phone Country Code": {
-          "Identifier": "select#text-entity-list-form-component-formElement-phoneNumber-country"
-        },
-        "Mobile Phone Number": {
-          "Identifier": "input#single-line-text-form-component-formElement-phoneNumber-nationalNumber"
-        }
+      "Email Address": {
+        "Identifier": "select#text-entity-list-form-component-formElement"
+      },
+      "Phone Country Code": {
+        "Identifier": "select#text-entity-list-form-component-formElement-phoneNumber-country"
+      },
+      "Mobile Phone Number": {
+        "Identifier": "input#single-line-text-form-component-formElement-phoneNumber-nationalNumber"
       },
       "Next Button on Easy Apply Form": {
-        "Identifier": "aria-label: button[aria-label='Continue to next step']"  
+        "Identifier": "button[aria-label='Continue to next step']"
       },
       "Submit Application": {
-        "Identifier": "aria-label: button[aria-label='Submit application']"  
+        "Identifier": "button[aria-label='Submit application']"
       }
     }
   }

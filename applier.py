@@ -5,6 +5,8 @@ from selenium.common.exceptions import WebDriverException, NoSuchElementExceptio
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import json
+import pickle
+import os
 
 def load_identifiers(json_path):
     with open(json_path, 'r') as file:
@@ -13,40 +15,44 @@ def load_identifiers(json_path):
 
 def initialize_driver():
     try:
-        driver = webdriver.Chrome(executable_path='/usr/local/bin/chromedriver')
+        options = webdriver.ChromeOptions()
+        # Comment out the next line to run in non-headless mode
+        # options.add_argument('--headless')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+        driver = webdriver.Chrome(executable_path='/usr/local/bin/chromedriver', options=options)
         return driver
     except WebDriverException as e:
         print(f"Error initializing the Chrome WebDriver: {e}")
         return None
-    
+
 def login_to_linkedin(driver, email, password, identifiers):
     try:
+        cookies_path = 'path/to/cookies.pkl'
         login_url = identifiers['Login']['URL']
         email_input_identifier = identifiers['Login']['Email/Username Input']['Identifier']
         password_input_identifier = identifiers['Login']['Password Input']['Identifier']
         sign_in_button_identifier = identifiers['Login']['Sign in Button']['Identifier']
 
         driver.get(login_url)
-        try:
+
+        # Load cookies if they exist
+        if os.path.exists(cookies_path):
+            cookies = pickle.load(open(cookies_path, "rb"))
+            for cookie in cookies:
+                driver.add_cookie(cookie)
+            driver.refresh()  # Refresh page to apply cookies
+        else:
+            # Normal login process
             username_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, email_input_identifier)))
             username_element.send_keys(email)
-        except (NoSuchElementException, TimeoutException) as e:
-            print(f"Error finding email input field: {e}")
-            return
-
-        try:
             password_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, password_input_identifier)))
             password_element.send_keys(password)
-        except (NoSuchElementException, TimeoutException) as e:
-            print(f"Error finding password input field: {e}")
-            return
-
-        try:
             sign_in_button = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, sign_in_button_identifier)))
             sign_in_button.click()
-        except (NoSuchElementException, TimeoutException) as e:
-            print(f"Error finding or clicking the sign-in button: {e}")
-            return
+
+            # Save cookies after successful login
+            pickle.dump(driver.get_cookies(), open(cookies_path, "wb"))
 
     except WebDriverException as e:
         print(f"General WebDriver error during login: {e}")
