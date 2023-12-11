@@ -28,7 +28,8 @@ COPY resume_parser.py /app/
 RUN pip3 install --no-cache-dir -r /app/requirements.txt
 
 # Set up VNC server (replace 'yourpassword' with a password of your choice)
-RUN x11vnc -storepasswd vnc123 /etc/x11vnc.pass
+# RUN x11vnc -storepasswd vnc /etc/x11vnc.pass
+
 
 # Expose VNC port (5900 is the default VNC port)
 EXPOSE 5900

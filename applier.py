@@ -14,25 +14,52 @@ def load_identifiers(json_path):
     return data
 
 def initialize_driver():
+    options = Options()
+    #options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    driver = webdriver.Chrome(options=options)
+    return driver
+
+def wait_for_verification(driver, identifiers, timeout=300):
+    """
+    Waits for the user to complete the verification step manually.
+    The default timeout is 5 minutes (300 seconds).
+    """
     try:
-        options = webdriver.ChromeOptions()
-        # Comment out the next line to run in non-headless mode
-        # options.add_argument('--headless')
-        options.add_argument('--no-sandbox')
-        options.add_argument('--disable-dev-shm-usage')
-        driver = webdriver.Chrome(executable_path='/usr/local/bin/chromedriver', options=options)
-        return driver
-    except WebDriverException as e:
-        print(f"Error initializing the Chrome WebDriver: {e}")
-        return None
+        verification_input_selector = identifiers['Login']['Verification']['Input Field']['Identifier']
+        submit_button_selector = identifiers['Login']['Verification']['Submit Button']['Identifier']
+        
+        # Wait for the verification input field to be present
+        verification_input = WebDriverWait(driver, timeout).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, verification_input_selector))
+        )
+        print("Verification page detected.")
+
+        # Ask user to input the verification code
+        verification_code = input("Enter the verification code here: ")
+        verification_input.send_keys(verification_code)
+
+        # Click the submit button
+        submit_button = driver.find_element(By.CSS_SELECTOR, submit_button_selector)
+        submit_button.click()
+        print("Verification code submitted.")
+
+    except TimeoutException:
+        print("Verification element not found or timeout reached.")
+    except Exception as e:
+        print(f"An error occurred during verification: {e}")
+
 
 def login_to_linkedin(driver, email, password, identifiers):
     try:
-        cookies_path = 'path/to/cookies.pkl'
+        cookies_path = 'path/to/cookies.pkl'  # Adjust this path as needed
         login_url = identifiers['Login']['URL']
         email_input_identifier = identifiers['Login']['Email/Username Input']['Identifier']
         password_input_identifier = identifiers['Login']['Password Input']['Identifier']
         sign_in_button_identifier = identifiers['Login']['Sign in Button']['Identifier']
+        verification_input_selector = identifiers['Login']['Verification']['Input Field']['Identifier']
+        submit_button_selector = identifiers['Login']['Verification']['Submit Button']['Identifier']
 
         driver.get(login_url)
 
@@ -44,110 +71,184 @@ def login_to_linkedin(driver, email, password, identifiers):
             driver.refresh()  # Refresh page to apply cookies
         else:
             # Normal login process
-            username_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, email_input_identifier)))
+            username_element = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, email_input_identifier))
+            )
             username_element.send_keys(email)
-            password_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, password_input_identifier)))
+
+            password_element = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, password_input_identifier))
+            )
             password_element.send_keys(password)
-            sign_in_button = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, sign_in_button_identifier)))
+
+            sign_in_button = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, sign_in_button_identifier))
+            )
             sign_in_button.click()
+
+            # Check for LinkedIn verification page
+            try:
+                WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, verification_input_selector))
+                )
+                verification_input = driver.find_element(By.CSS_SELECTOR, verification_input_selector)
+                verification_code = input("Enter the verification code here: ")
+                verification_input.send_keys(verification_code)
+
+                submit_button = driver.find_element(By.CSS_SELECTOR, submit_button_selector)
+                submit_button.click()
+                print("Verification code submitted.")
+            except TimeoutException:
+                # If verification page is not detected, continue with the script
+                print("No verification step detected. Proceeding...")
+
+            # Ensure the directory for cookies exists before saving them
+            cookies_dir = os.path.dirname(cookies_path)
+            if not os.path.exists(cookies_dir):
+                os.makedirs(cookies_dir)
 
             # Save cookies after successful login
             pickle.dump(driver.get_cookies(), open(cookies_path, "wb"))
 
     except WebDriverException as e:
         print(f"General WebDriver error during login: {e}")
+        # Continue execution even if an error occurs
+
+
+
 
 def search_jobs(driver, job_title, location, identifiers):
     try:
-        driver.get(identifiers['Job Search']['URL'])
-        
-        try:
-            job_title_input = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, identifiers['Job Search']['Job Title Input']['Identifier']))
-            )
-            job_title_input.send_keys(job_title)
-        except (NoSuchElementException, TimeoutException) as e:
-            print(f"Error finding job title input field: {e}")
-            return
+        # Navigate to LinkedIn home page
+        driver.get("https://www.linkedin.com")
 
-        try:
-            magnifying_glass = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, identifiers['Job Search']['Magnifying Glass (Initialize Search Fields) Icon']['Identifier']))
-            )
-            magnifying_glass.click()
-        except (NoSuchElementException, TimeoutException) as e:
-            print(f"Error finding or clicking the magnifying glass icon: {e}")
-            return
+        # Click on 'Jobs' tab
+        jobs_tab = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, identifiers['Navigation']['Jobs Tab']['Identifier']))
+        )
+        jobs_tab.click()
 
-        try:
-            location_input = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, identifiers['Job Search']['Location Input']['Identifier']))
-            )
-            location_input.send_keys(location)
-            location_input.send_keys(Keys.ENTER)
-        except (NoSuchElementException, TimeoutException) as e:
-            print(f"Error finding or using the location input field: {e}")
-            return
+        # Wait for the Jobs page to load
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, identifiers['Job Search']['Job Title Input']['Identifier']))
+        )
 
+        # Input job title
+        job_title_input = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, ".jobs-search-box__text-input[aria-label='Search by title, skill, or company']"))
+        )
+        job_title_input.send_keys(job_title)
+
+        # Input location
+        location_input = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, ".jobs-search-box__text-input[aria-label='City, state, or zip code']"))
+        )
+        location_input.clear()
+        location_input.send_keys(location)
+
+        # Refocus on job title input and initiate search by pressing Enter
+        job_title_input.click()
+        job_title_input.send_keys(Keys.ENTER)
+
+
+        # Click on 'All Filters'
         try:
             all_filters_btn = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, identifiers['Job Search']['All Filters Button']['Identifier']))
+                EC.element_to_be_clickable((By.CSS_SELECTOR, "button.search-reusables__all-filters-pill-button"))
             )
             all_filters_btn.click()
         except (NoSuchElementException, TimeoutException) as e:
-            print(f"Error finding or clicking the 'All Filters' button: {e}")
-            return
+            print(f"Error clicking on All Filters button: {e}")
+            return  # Exit the function if unable to click on All Filters button
 
+        # Check 'Full-time' option and click 'Show results'
         try:
-            easy_apply_toggle = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, identifiers['Job Search']['Easy Apply Toggle']['Identifier']))
-            )
-            if easy_apply_toggle.get_attribute('aria-checked') == 'false':
-                easy_apply_toggle.click()
-        except (NoSuchElementException, TimeoutException) as e:
-            print(f"Error finding or using the 'Easy Apply' toggle: {e}")
-            return
+            WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "input[name='f_WT'] + label"))
+            ).click()
 
-        try:
             show_results_btn = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.CSS_SELECTOR, "[data-test-reusables-filters-modal-show-results-button='true']"))
+                EC.element_to_be_clickable((By.CSS_SELECTOR, "button[data-control-name='all_filters_apply']"))
             )
             show_results_btn.click()
         except (NoSuchElementException, TimeoutException) as e:
-            print(f"Error finding or clicking the 'Show Results' button: {e}")
-            return
+            print(f"Error applying filters: {e}")
+            return  # Exit the function if unable to apply filters
+
+        # Check 'Remote' option and click 'Show results'
+        try:
+            WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "input[name='f_WRA'] + label"))
+            ).click()
+
+            show_results_btn = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.CSS_SELECTOR, "button[data-control-name='all_filters_apply']"))
+            )
+            show_results_btn.click()
+        except (NoSuchElementException, TimeoutException) as e:
+            print(f"Error applying filters: {e}")
+            return  # Exit the function if unable to apply filters
 
     except WebDriverException as e:
         print(f"General WebDriver error during job search: {e}")
+        # Continue execution even if a general WebDriver exception occurs
+
 
 
 def apply_filters(driver, identifiers):
     try:
-        # Try to retrieve the 'Show Results' button identifier
+        # Click on 'All Filters'
         try:
-            show_results_button_id = identifiers["Job Search"]["Show Results Button"]["Identifier"]
-        except KeyError as e:
-            print(f"Error finding 'Show Results' button identifier in JSON: {e}")
-            return
-
-        # Try to find and click the 'Show Results' button
-        try:
-            show_results_button = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.ID, show_results_button_id))
+            all_filters_btn = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.CSS_SELECTOR, identifiers["Job Search"]["All Filters Button"]["Identifier"]))
             )
-            show_results_button.click()
+            all_filters_btn.click()
         except (NoSuchElementException, TimeoutException) as e:
-            print(f"Error during applying filters: {e}")
-            return
+            print(f"Error clicking 'All Filters': {e}")
+            return  # Exit the function if unable to click 'All Filters'
+
+        # Toggle 'Easy Apply' if not already enabled
+        try:
+            easy_apply_toggle = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, identifiers["Job Search"]["Easy Apply Toggle"]["Identifier"]))
+            )
+            if easy_apply_toggle.get_attribute('aria-checked') == 'false':
+                easy_apply_toggle.click()
+        except (NoSuchElementException, TimeoutException) as e:
+            print(f"Error toggling 'Easy Apply': {e}")
+            return  # Exit the function if unable to toggle 'Easy Apply'
+
+        # Click on 'Show results' button
+        try:
+            show_results_btn = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.CSS_SELECTOR, identifiers["Job Search"]["Show Results Button"]["Identifier"]))
+            )
+            show_results_btn.click()
+        except (NoSuchElementException, TimeoutException) as e:
+            print(f"Error clicking 'Show Results': {e}")
+            return  # Exit the function if unable to click 'Show Results'
+
+        # Click on 'Show results' button
+        try:
+            show_results_btn = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.CSS_SELECTOR, identifiers["Job Search"]["Show Results Button"]["Identifier"]))
+            )
+            show_results_btn.click()
+        except (NoSuchElementException, TimeoutException) as e:
+            print(f"Error clicking 'Show Results': {e}")
+            return  # Exit the function if unable to click 'Show Results'
 
     except WebDriverException as e:
         print(f"General WebDriver error during applying filters: {e}")
+        # Continue execution even if a general WebDriver exception occurs
+
+
 
 def get_job_links(driver, identifiers):
     job_links = []
-    
+
     try:
-        while True:  # Continue looping as long as there's a next page
+        while True:
             try:
                 # Ensure the job listings have loaded
                 WebDriverWait(driver, 10).until(
@@ -163,12 +264,14 @@ def get_job_links(driver, identifiers):
                         if easy_apply_elements:
                             link_element = listing.find_element(By.CSS_SELECTOR, identifiers['Job Listing']['Job Link']['Identifier'])
                             link = link_element.get_attribute('href')
-                            if link:  # Ensure the link is not None
+                            if link:
                                 job_links.append(link)
                     except NoSuchElementException:
                         print("No such element while extracting job links in current page.")
+                        continue  # Continue with the next listing
                     except StaleElementReferenceException:
                         print("Stale element reference encountered while extracting job links.")
+                        continue  # Continue with the next listing
 
                 # Check for and navigate to the next page
                 next_page_buttons = driver.find_elements(By.CSS_SELECTOR, identifiers['Job Listing']['Next Page Button']['Identifier'])
@@ -178,72 +281,15 @@ def get_job_links(driver, identifiers):
                 next_page_button = next_page_buttons[0]
                 driver.execute_script("arguments[0].scrollIntoView();", next_page_button)
                 next_page_button.click()
-
             except TimeoutException:
                 print("Timeout while waiting for job listings to load.")
-                break
+                break  # Break the loop if the page times out
 
     except Exception as e:
         print(f"Unexpected error while extracting job links: {e}")
+        # Continue execution even if an unexpected exception occurs
 
     return job_links
-
-
-
-def apply_for_job(driver, identifiers):
-    try:
-        # Click Easy Apply button
-        easy_apply_button = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, identifiers['Apply for Job']['Easy Apply Button']['Identifier']))
-        )
-        easy_apply_button.click()
-        print("Clicked Easy Apply button.")
-
-        # Fill out form fields
-        email_input = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, identifiers['Apply for Job']['Form Fields']['Email Address']['Identifier']))
-        )
-        email_input.send_keys('dangarcia31538@gmail.com')  # Replace with actual email
-        
-        # Additional form fields logic here...
-
-        # Click next button after filling out fields
-        next_button = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, identifiers['Apply for Job']['Next Button']['Identifier']))
-        )
-        next_button.click()
-        print("Clicked Next button.")
-
-        # Review and submission process
-        review_button = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, identifiers['Apply for Job']['Review Button']['Identifier']))
-        )
-        review_button.click()
-        print("Clicked Review button.")
-
-        # Uncheck "Follow Company" toggle
-        follow_company_toggle = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, identifiers['Apply for Job']['Follow Company Toggle']['Identifier']))
-        )
-        if follow_company_toggle.is_selected():
-            follow_company_toggle.click()
-            print("Unchecked Follow Company toggle.")
-
-        # Submit Application
-        submit_application_button = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, identifiers['Apply for Job']['Submit Application Button']['Identifier']))
-        )
-        submit_application_button.click()
-        print("Submitted application.")
-
-    except NoSuchElementException:
-        print("Element not found while applying for the job.")
-    except TimeoutException:
-        print("Timeout occurred while applying for the job.")
-    except StaleElementReferenceException:
-        print("Stale element reference encountered while applying for the job.")
-    except Exception as e:
-        print(f"Unexpected error while applying for the job: {e}")
 
 
 def search_and_apply_for_jobs(driver, job_titles, location, email, password):
@@ -257,33 +303,39 @@ def search_and_apply_for_jobs(driver, job_titles, location, email, password):
             try:
                 print(f"Searching for job title: {job_title}")
                 search_jobs(driver, job_title, location)
-                
-                print("Retrieving job links.")
-                job_links = get_job_links(driver)
-                
-                for job_link in job_links:
-                    try:
-                        print(f"Navigating to job link: {job_link}")
-                        driver.get(job_link)
-                        
-                        job_page_title = driver.title
-                        print(f"Job page title: {job_page_title}")
-                        
-                        if any(keyword in job_page_title for keyword in undesired_keywords):
-                            print(f"Skipping job due to undesired keyword in title: {job_page_title}")
-                            continue
-                        
-                        print("Applying for job.")
-                        apply_for_job(driver)
-                    
-                    except Exception as e:
-                        print(f"Error while applying for job at {job_link}: {e}")
-                
             except Exception as e:
                 print(f"Error during job search for title '{job_title}': {e}")
+                continue  # Continue with the next job title if an error occurs
+
+            print("Retrieving job links.")
+            job_links = get_job_links(driver)
+            if not job_links:
+                print("No job links found. Moving to next job title.")
+                continue  # Continue with the next job title if no job links are found
+
+            for job_link in job_links:
+                try:
+                    print(f"Navigating to job link: {job_link}")
+                    driver.get(job_link)
+                    
+                    job_page_title = driver.title
+                    print(f"Job page title: {job_page_title}")
+                    
+                    if any(keyword in job_page_title for keyword in undesired_keywords):
+                        print(f"Skipping job due to undesired keyword in title: {job_page_title}")
+                        continue  # Continue with the next job link if undesired keyword found
+                    
+                    print("Applying for job.")
+                    apply_for_job(driver)
+                
+                except Exception as e:
+                    print(f"Error while applying for job at {job_link}: {e}")
+                    continue  # Continue with the next job link if an error occurs during application
     
     except Exception as e:
         print(f"Error logging into LinkedIn: {e}")
+        # Continue execution even if an error occurs during login
+
 
 
 

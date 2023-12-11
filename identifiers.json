@@ -9,15 +9,29 @@
     },
     "Sign in Button": {
       "Identifier": "button[type='submit']"
+    },
+    "Verification": {
+      "Input Field": {
+        "Identifier": "#input__email_verification_pin"
+      },
+      "Submit Button": {
+        "Identifier": "#email-pin-submit-button"
+      }
+    }
+  },
+  "Navigation": {
+    "Jobs Tab": {
+      "Identifier": "a[href='https://www.linkedin.com/jobs/?']"
     }
   },
   "Job Search": {
     "URL": "https://www.linkedin.com/jobs/",
     "All Filters Button": {
-      "Identifier": "button[aria-label='Show all filters']"
+      "Identifier": "button.search-reusables__all-filters-pill-button"
     },
     "Easy Apply Toggle": {
-      "Identifier": "input[data-artdeco-toggle-button='true']"
+      "Identifier": "input[data-artdeco-toggle-button='true'][type='checkbox']"
+
     },
     "Show Results Button": {
       "Identifier": "button[data-test-reusables-filters-modal-show-results-button='true']"
