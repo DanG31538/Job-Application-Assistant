@@ -124,123 +124,72 @@ def search_jobs(driver, job_title, location, identifiers):
 
         # Click on 'Jobs' tab
         jobs_tab = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, identifiers['Navigation']['Jobs Tab']['Identifier']))
+            EC.element_to_be_clickable((By.CSS_SELECTOR, identifiers['Navigation']['Jobs Tab']['Identifier']))
         )
         jobs_tab.click()
+        print("Clicked on 'Jobs' tab.")
 
-        # Wait for the Jobs page to load
-        WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, identifiers['Job Search']['Job Title Input']['Identifier']))
+        # Explicit wait for the job title input field on the Jobs page
+        job_title_input = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, identifiers['Job Search']['Job Title Input']['Identifier']))
         )
+        print("Job title input field is clickable.")
+
+        # Check if we are on the Jobs page by verifying the presence of a distinct element on that page
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "Some distinct element selector on Jobs page"))
+        )
+        print("Detected presence of a distinct element on Jobs page.")
 
         # Input job title
-        job_title_input = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, ".jobs-search-box__text-input[aria-label='Search by title, skill, or company']"))
-        )
         job_title_input.send_keys(job_title)
+        print(f"Entered job title: {job_title}")
 
-        # Input location
+        # Wait and input location
         location_input = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, ".jobs-search-box__text-input[aria-label='City, state, or zip code']"))
+            EC.element_to_be_clickable((By.CSS_SELECTOR, identifiers['Job Search']['Location Input']['Identifier']))
         )
         location_input.clear()
         location_input.send_keys(location)
+        print(f"Entered location: {location}")
 
-        # Refocus on job title input and initiate search by pressing Enter
-        job_title_input.click()
+        # Initiate search by pressing Enter
         job_title_input.send_keys(Keys.ENTER)
+        print("Initiated search.")
 
-
-        # Click on 'All Filters'
-        try:
-            all_filters_btn = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.CSS_SELECTOR, "button.search-reusables__all-filters-pill-button"))
-            )
-            all_filters_btn.click()
-        except (NoSuchElementException, TimeoutException) as e:
-            print(f"Error clicking on All Filters button: {e}")
-            return  # Exit the function if unable to click on All Filters button
-
-        # Check 'Full-time' option and click 'Show results'
-        try:
-            WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, "input[name='f_WT'] + label"))
-            ).click()
-
-            show_results_btn = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.CSS_SELECTOR, "button[data-control-name='all_filters_apply']"))
-            )
-            show_results_btn.click()
-        except (NoSuchElementException, TimeoutException) as e:
-            print(f"Error applying filters: {e}")
-            return  # Exit the function if unable to apply filters
-
-        # Check 'Remote' option and click 'Show results'
-        try:
-            WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, "input[name='f_WRA'] + label"))
-            ).click()
-
-            show_results_btn = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.CSS_SELECTOR, "button[data-control-name='all_filters_apply']"))
-            )
-            show_results_btn.click()
-        except (NoSuchElementException, TimeoutException) as e:
-            print(f"Error applying filters: {e}")
-            return  # Exit the function if unable to apply filters
+        # Apply filters (primarily 'Easy Apply')
+        apply_filters(driver, identifiers)
 
     except WebDriverException as e:
         print(f"General WebDriver error during job search: {e}")
-        # Continue execution even if a general WebDriver exception occurs
+
 
 
 
 def apply_filters(driver, identifiers):
     try:
         # Click on 'All Filters'
-        try:
-            all_filters_btn = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.CSS_SELECTOR, identifiers["Job Search"]["All Filters Button"]["Identifier"]))
-            )
-            all_filters_btn.click()
-        except (NoSuchElementException, TimeoutException) as e:
-            print(f"Error clicking 'All Filters': {e}")
-            return  # Exit the function if unable to click 'All Filters'
+        all_filters_btn = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, identifiers["Job Search"]["All Filters Button"]["Identifier"]))
+        )
+        all_filters_btn.click()
 
         # Toggle 'Easy Apply' if not already enabled
-        try:
-            easy_apply_toggle = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, identifiers["Job Search"]["Easy Apply Toggle"]["Identifier"]))
-            )
-            if easy_apply_toggle.get_attribute('aria-checked') == 'false':
-                easy_apply_toggle.click()
-        except (NoSuchElementException, TimeoutException) as e:
-            print(f"Error toggling 'Easy Apply': {e}")
-            return  # Exit the function if unable to toggle 'Easy Apply'
+        easy_apply_toggle = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, identifiers["Job Search"]["Easy Apply Toggle"]["Identifier"]))
+        )
+        if easy_apply_toggle.get_attribute('aria-checked') == 'false':
+            easy_apply_toggle.click()
 
         # Click on 'Show results' button
-        try:
-            show_results_btn = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.CSS_SELECTOR, identifiers["Job Search"]["Show Results Button"]["Identifier"]))
-            )
-            show_results_btn.click()
-        except (NoSuchElementException, TimeoutException) as e:
-            print(f"Error clicking 'Show Results': {e}")
-            return  # Exit the function if unable to click 'Show Results'
+        show_results_btn = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, identifiers["Job Search"]["Show Results Button"]["Identifier"]))
+        )
+        show_results_btn.click()
 
-        # Click on 'Show results' button
-        try:
-            show_results_btn = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.CSS_SELECTOR, identifiers["Job Search"]["Show Results Button"]["Identifier"]))
-            )
-            show_results_btn.click()
-        except (NoSuchElementException, TimeoutException) as e:
-            print(f"Error clicking 'Show Results': {e}")
-            return  # Exit the function if unable to click 'Show Results'
+    except (NoSuchElementException, TimeoutException, WebDriverException) as e:
+        print(f"Error in applying filters: {e}")
 
-    except WebDriverException as e:
-        print(f"General WebDriver error during applying filters: {e}")
-        # Continue execution even if a general WebDriver exception occurs
 
 
 
